@@ -1,21 +1,26 @@
 #!/usr/bin/python3
-
+"""Returns to-do list information for a given employee ID."""
 import requests
 import sys
 
-if __name__ == '__main__':
-    user_id = sys.argv[1]
-    url = f"https://jsonplaceholder.typicode.com/users/{user_id}"
-    user_response = requests.get(url).json()
-    user_name = user_response.get('name')
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: {} <employee_id>".format(sys.argv[0]))
+        sys.exit(1)
 
-    todo_url = f"https://jsonplaceholder.typicode.com/todos?userId={user_id}"
-    todo_response = requests.get(todo_url).json()
+    employee_id = sys.argv[1]
+    url = "https://jsonplaceholder.typicode.com/"
 
-    completed_tasks = [task for task in todo_response if task.get('completed')]
-    total_tasks = len(todo_response)
-    completed_tasks_count = len(completed_tasks)
+    # Fetch user data
+    user = requests.get(url + "users/{}".format(employee_id)).json()
+    # Fetch TODOs for the user
+    todos = requests.get(url + "todos", params={"userId": employee_id}).json()
 
-    print(f"Employee {user_name} is done with tasks({completed_tasks_count}/{total_tasks}):")
-    for task in completed_tasks:
-        print(f"\t {task.get('title')}")
+    # Filter out completed tasks
+    completed = [t.get("title") for t in todos if t.get("completed")]
+
+    # Display the employee's TODO list progress
+    print("Employee {} is done with tasks({}/{}):".format(
+        user.get("name"), len(completed), len(todos)))
+    for task in completed:
+        print("\t {}".format(task))
