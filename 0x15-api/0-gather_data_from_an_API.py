@@ -1,26 +1,27 @@
 #!/usr/bin/python3
-"""Returns to-do list information for a given employee ID."""
+'''
+Python script that returns information using REST API
+'''
 import requests
-import sys
+from sys import argv
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: {} <employee_id>".format(sys.argv[0]))
-        sys.exit(1)
-
-    employee_id = sys.argv[1]
-    url = "https://jsonplaceholder.typicode.com/"
-
-    # Fetch user data
-    user = requests.get(url + "users/{}".format(employee_id)).json()
-    # Fetch TODOs for the user
-    todos = requests.get(url + "todos", params={"userId": employee_id}).json()
-
-    # Filter out completed tasks
-    completed = [t.get("title") for t in todos if t.get("completed")]
-
-    # Display the employee's TODO list progress
-    print("Employee {} is done with tasks({}/{}):".format(
-        user.get("name"), len(completed), len(todos)))
-    for task in completed:
-        print("\t {}".format(task))
+    if len(argv) > 1:
+        user = argv[1]
+        url = "https://jsonplaceholder.typicode.com/"
+        req = requests.get("{}users/{}".format(url, user))
+        name = req.json().get("name")
+        if name is not None:
+            jreq = requests.get(
+                "{}todos?userId={}".format(
+                    url, user)).json()
+            alltsk = len(jreq)
+            completedtsk = []
+            for t in jreq:
+                if t.get("completed") is True:
+                    completedtsk.append(t)
+            count = len(completedtsk)
+            print("Employee {} is done with tasks({}/{}):"
+                  .format(name, count, alltsk))
+            for title in completedtsk:
+                print("\t {}".format(title.get("title")))
