@@ -1,30 +1,36 @@
 #!/usr/bin/python3
-'''the script that collect the employees
-and the total of tasks
-'''
-
-import re
+""" Script that uses REST API for a given employee ID
+and returns information about the employee TODO list progress."""
 import requests
-import sys
+from sys import argv
 
-REST_API = "https://jsonplaceholder.typicode.com"
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if re.fullmatch(r'\d+', sys.argv[1]):
-            id = int(sys.argv[1])
-            emp_req = requests.get('{}/users/{}'.format(REST_API, id)).json()
-            task_req = requests.get('{}/todos'.format(REST_API)).json()
-            emp_name = emp_req.get('name')
-            tasks = list(filter(lambda x: x.get('userId') == id, task_req))
-            completed_tasks = list(filter(lambda x: x.get('completed'), tasks))
-            print(
-                'Employee {} is done with tasks({}/{}):'.format(
-                    emp_name,
-                    len(completed_tasks),
-                    len(tasks)
-                )
-            )
-            if len(completed_tasks) > 0:
-                for task in completed_tasks:
-                    print('\t {}'.format(task.get('title')))
+def get_employee():
+    base_url = 'https://jsonplaceholder.typicode.com/'
+    user_id = argv[1]
+
+    user_res = requests.get(base_url + 'users/{}'.format(user_id)).json()
+    user_name = user_res.get('name')
+
+    todos_res = requests.get(base_url + 'todos').json()
+
+    titles = []
+    completed = 0
+    total = 0
+
+    for t in todos_res:
+        if (t['userId'] == int(user_id)):
+            if (t['completed'] is True):
+                completed += 1
+                titles.append(t['title'])
+            total += 1
+
+    print("Employee {} is done with tasks({}/{}):"
+          .format(user_name, completed, total))
+
+    for title in titles:
+        print("\t {}".format(title))
+
+
+if __name__ == "__main__":
+    get_employee()
