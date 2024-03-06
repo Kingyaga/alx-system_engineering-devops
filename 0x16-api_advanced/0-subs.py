@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-import requests
-"""Module for querying the Reddit API for a given subreddit's subscriber count."""
 
+"""Module for querying the Reddit API for a given subreddit's subscriber count."""
+import requests
 def number_of_subscribers(subreddit):
     """Returns the number of subscribers for a given subreddit. If the subreddit is invalid, returns 0."""
     try:
