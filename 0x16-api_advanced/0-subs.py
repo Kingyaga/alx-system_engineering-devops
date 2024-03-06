@@ -12,3 +12,4 @@ def number_of_subscribers(subreddit):
         return count.json().get('data', {}).get('subscribers', 0)
     except (requests.exceptions.RequestException, ValueError, KeyError):
         return 0
+    
