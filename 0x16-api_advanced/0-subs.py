@@ -1,15 +1,26 @@
 #!/usr/bin/python3
-"""Advance API module"""
+"""
+Module for querying the Reddit API for a given subreddit's subscriber count.
+"""
 import requests
 
 def number_of_subscribers(subreddit):
-    """Get the number of subscribers for a subreddit"""
+    """
+    Returns the number of subscribers for a given subreddit.
+    If the subreddit is invalid, returns 0.
+    """
+    url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    headers = {"User-Agent": "0x16-api_advanced:project: v1.0.0 (by /u/Moh'King Yaga)"}
+
     try:
-        headers = {'User-Agent': '0x16-api_advanced:project: v1.0.0 (by /u/Moh\'King Yaga'}
         with requests.Session() as session:
-            count = session.get(f'https://www.reddit.com/r/{subreddit}/about.json', headers=headers)
-        count.raise_for_status()
-        return count.json().get('data', {}).get('subscribers', 0)
-    except (requests.exceptions.RequestException, ValueError, KeyError):
+            response = session.get(url, headers=headers, allow_redirects=False)
+        response.raise_for_status()
+    except requests.exceptions.RequestException:
         return 0
-    
+
+    try:
+        data = response.json()
+        return data["data"]["subscribers"]
+    except (ValueError, KeyError):
+        return 0
