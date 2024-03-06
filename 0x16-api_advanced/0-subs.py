@@ -1,17 +1,24 @@
 #!/usr/bin/python3
-""" Advance API module """
 
+"""
+Querries the Reddit API and returns the total number of subscribers for a
+given subreddit.
+If an invalid subreddit is given, return 0.
+"""
+import json
 import requests
 
 
 def number_of_subscribers(subreddit):
-    """ Get number of subscribers for a subreddit """
-    try:
-        headers = {'User-Agent': '0x16-api_advanced:project:\
-        v1.0.0 (by /u/Moh\'King Yaga'}
-        count = requests.get('https://www.reddit.com/r/{}/about.json'.format(
-                             subreddit), headers=headers)
-        count.raise_for_status()
-        return count.json().get('data', {}).get('subscribers', 0)
-    except Exception:
+    """Querries Reddit API and returns total subscribers for a given subreddit,
+       or 0 if invalid subreddit given.
+    """
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+
+    headers = {'User-Agent': '0x16-api_advanced:project: v1.0.0 (by /u/Moh\'King Yaga'}
+
+    response = requests.get(url, headers=headers, allow_redirects=False)
+    if response.status_code != 200:
         return 0
+    results = response.json().get("data")
+    return results.get("subscribers")
